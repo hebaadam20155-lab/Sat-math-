@@ -1,0 +1,709 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital SAT Math - Eng. Heba Eyad</title>
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+
+  <style>
+    :root {
+      --bluebook-dark: #1e293b;
+      --bluebook-blue: #2563eb;
+      --bluebook-bg: #f8fafc;
+      --border-color: #cbd5e1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { display: flex; flex-direction: column; height: 100vh; background: var(--bluebook-bg); overflow: hidden; position: relative; }
+
+    .watermark-layer {
+      position: fixed; inset: -20%; pointer-events: none; z-index: 40;
+      display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around;
+      transform: rotate(-26deg); opacity: 0.065; user-select: none;
+    }
+    .watermark-item {
+      font-size: 26px; font-weight: 800; color: #0f172a; text-align: center;
+      padding: 50px 70px; white-space: nowrap; letter-spacing: 1px;
+    }
+    .watermark-item span { display: block; font-size: 18px; font-weight: 700; margin-top: 4px; }
+
+    .start-screen {
+      position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      display: flex; justify-content: center; align-items: center; z-index: 200; padding: 20px;
+    }
+    .start-card {
+      background: white; width: 100%; max-width: 480px; border-radius: 16px;
+      padding: 36px 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); text-align: center;
+    }
+    .brand-badge {
+      display: inline-block; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+      padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 14px; margin-bottom: 14px;
+    }
+    .start-card h1 { font-size: 24px; color: #0f172a; margin-bottom: 8px; }
+    .start-card p { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+    .input-group { text-align: left; margin-bottom: 18px; }
+    .input-group label { display: block; font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+    .input-group input {
+      width: 100%; padding: 12px 14px; font-size: 16px; border: 2px solid #cbd5e1;
+      border-radius: 8px; outline: none; transition: 0.2s;
+    }
+    .input-group input:focus { border-color: var(--bluebook-blue); }
+    .start-btn {
+      width: 100%; background: var(--bluebook-blue); color: white; border: none;
+      padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: 0.2s; margin-top: 8px;
+    }
+    .start-btn:hover { background: #1d4ed8; }
+
+    header {
+      background: white; border-bottom: 2px solid var(--border-color);
+      padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;
+      height: 68px; z-index: 10;
+    }
+    .module-switcher { display: flex; align-items: center; gap: 10px; }
+    .mod-btn {
+      padding: 7px 14px; border-radius: 6px; border: 2px solid var(--bluebook-dark);
+      background: white; color: var(--bluebook-dark); font-weight: 700; cursor: pointer; font-size: 14px;
+    }
+    .mod-btn.active { background: var(--bluebook-dark); color: white; }
+
+    .timer-box { text-align: center; }
+    .timer { font-size: 22px; font-weight: 700; color: var(--bluebook-dark); font-variant-numeric: tabular-nums; }
+    .tools-bar { display: flex; gap: 8px; }
+    .tool-btn {
+      background: #f1f5f9; border: 1px solid #94a3b8; border-radius: 6px;
+      padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: 0.2s;
+    }
+    .tool-btn:hover, .tool-btn.active { background: var(--bluebook-dark); color: white; border-color: var(--bluebook-dark); }
+
+    main { flex: 1; display: flex; overflow: hidden; position: relative; z-index: 10; }
+    .left-pane {
+      width: 48%; border-right: 3px solid var(--border-color); background: white;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 20px; overflow-y: auto; position: relative;
+    }
+    .left-pane.hidden { display: none; }
+    #calculator { width: 100%; height: 100%; display: none; }
+    .diagram-container { width: 100%; text-align: center; }
+    .diagram-container img { max-width: 92%; max-height: 400px; border-radius: 8px; }
+
+    .right-pane { flex: 1; padding: 32px 48px; overflow-y: auto; background: white; }
+    .q-header {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #f1f5f9; border-bottom: 2px solid var(--bluebook-dark);
+      padding: 8px 14px; margin-bottom: 20px;
+    }
+    .q-num-badge {
+      background: var(--bluebook-dark); color: white; font-weight: bold;
+      padding: 4px 12px; border-radius: 4px; font-size: 15px;
+    }
+    .mark-review {
+      cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; user-select: none;
+    }
+    .mark-review input { width: 16px; height: 16px; cursor: pointer; }
+
+    .question-stem { font-size: 18px; line-height: 1.75; color: #0f172a; margin-bottom: 24px; }
+
+    .sat-table { border-collapse: collapse; margin: 16px 0; font-size: 16px; min-width: 280px; }
+    .sat-table th, .sat-table td { border: 1.5px solid #1e293b; padding: 8px 16px; text-align: center; }
+    .sat-table th { background: #f1f5f9; font-weight: 700; }
+
+    .options-list { display: flex; flex-direction: column; gap: 12px; }
+    .option-card {
+      border: 2px solid #cbd5e1; border-radius: 8px; padding: 14px 18px;
+      display: flex; align-items: center; gap: 14px; cursor: pointer; transition: 0.15s;
+      font-size: 17px; background: white;
+    }
+    .option-card:hover { border-color: #64748b; background: #f8fafc; }
+    .option-card.selected { border-color: var(--bluebook-blue); background: #eff6ff; }
+    .option-letter {
+      width: 32px; height: 32px; border-radius: 50%; border: 2px solid #64748b;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0;
+    }
+    .option-card.selected .option-letter {
+      background: var(--bluebook-blue); color: white; border-color: var(--bluebook-blue);
+    }
+
+    .spr-box { margin-top: 15px; }
+    .spr-input {
+      width: 250px; padding: 12px 16px; font-size: 18px; border: 2px solid var(--bluebook-dark);
+      border-radius: 8px; outline: none;
+    }
+    .spr-input:focus { border-color: var(--bluebook-blue); }
+
+    footer {
+      background: white; border-top: 2px solid var(--border-color);
+      padding: 12px 28px; display: flex; justify-content: space-between; align-items: center;
+      height: 68px; z-index: 10;
+    }
+    .nav-center-btn {
+      background: var(--bluebook-dark); color: white; border: none;
+      padding: 10px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px;
+    }
+    .nav-btns { display: flex; gap: 12px; }
+    .btn-primary {
+      background: var(--bluebook-blue); color: white; border: none;
+      padding: 10px 24px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 14px;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary {
+      background: #e2e8f0; color: #1e293b; border: none;
+      padding: 10px 20px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 14px;
+    }
+    .btn-whatsapp {
+      background: #16a34a; color: white; border: none;
+      padding: 10px 20px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 14px;
+    }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+      display: none; justify-content: center; align-items: center; z-index: 100;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: white; padding: 28px; border-radius: 12px; width: 92%; max-width: 780px;
+      max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+    .q-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 10px; margin: 16px 0;
+    }
+    .q-grid-item {
+      height: 46px; border: 2px solid #cbd5e1; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+      cursor: pointer; position: relative;
+    }
+    .q-grid-item.answered { background: var(--bluebook-dark); color: white; border-color: var(--bluebook-dark); }
+    .q-grid-item.current { border-color: var(--bluebook-blue); border-width: 3px; }
+    .q-grid-item.marked::after { content: "🚩"; position: absolute; top: -8px; right: -6px; font-size: 12px; }
+
+    .student-summary-card {
+      background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px;
+      padding: 16px 20px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .result-row {
+      border-bottom: 1px solid #e2e8f0; padding: 10px 0; display: flex; justify-content: space-between; font-size: 15px;
+    }
+    .correct-badge { color: #16a34a; font-weight: bold; }
+    .wrong-badge { color: #dc2626; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="watermark-layer">
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+    <div class="watermark-item">Eng. Heba Eyad<span>+20 12 24608079</span></div>
+  </div>
+
+  <div class="start-screen" id="start-screen">
+    <div class="start-card">
+      <div class="brand-badge">Eng. Heba Eyad • SAT Math</div>
+      <h1>Digital SAT Math Practice</h1>
+      <p>June 2026 International A • Module 1 & Module 2 (44 Questions)</p>
+
+      <div class="input-group">
+        <label for="student-name-input">Student Full Name (اسم الطالب رباعي) *</label>
+        <input type="text" id="student-name-input" placeholder="Enter your full name..." required>
+      </div>
+
+      <div class="input-group">
+        <label for="student-group-input">Group / Phone Number (المجموعة أو رقم الهاتف)</label>
+        <input type="text" id="student-group-input" placeholder="Optional...">
+      </div>
+
+      <button class="start-btn" onclick="startExam()">Start Exam ➔</button>
+      <div style="margin-top:16px; font-size:13px; color:#475569; font-weight:600;">
+        📞 Contact: +20 12 24608079
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="module-switcher">
+      <button class="mod-btn active" id="mod1-btn" onclick="switchModule(1)">Module 1 (Q1–Q22)</button>
+      <button class="mod-btn" id="mod2-btn" onclick="switchModule(2)">Module 2 (Q1–Q22)</button>
+    </div>
+    <div class="timer-box">
+      <div class="timer" id="timer-display">70:00</div>
+      <div style="font-size:11px; color:#64748b; font-weight:700;">Eng. Heba Eyad</div>
+    </div>
+    <div class="tools-bar">
+      <button class="tool-btn" id="calc-btn" onclick="toggleCalculator()">🖩 Calculator</button>
+      <button class="tool-btn" onclick="toggleModal('ref-modal')">📐 Reference</button>
+      <button class="tool-btn" onclick="finishExam()" style="background:#fee2e2; border-color:#ef4444; color:#991b1b;">✔ Submit & Score</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="left-pane" id="left-pane">
+      <div id="calculator"></div>
+      <div class="diagram-container" id="diagram-area"></div>
+    </div>
+
+    <div class="right-pane">
+      <div class="q-header">
+        <span class="q-num-badge" id="q-number">1</span>
+        <label class="mark-review">
+          <input type="checkbox" id="mark-checkbox" onchange="toggleMark()"> Mark for Review
+        </label>
+      </div>
+
+      <div class="question-stem" id="q-stem"></div>
+      <div id="q-interaction"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div>
+      <div style="font-weight:700; color:#0f172a; font-size:15px;" id="footer-student-name">Student: —</div>
+      <div style="font-size:12px; color:#2563eb; font-weight:700;" id="footer-mod-title">Eng. Heba Eyad | Module 1</div>
+    </div>
+    <button class="nav-center-btn" id="nav-summary-btn" onclick="toggleModal('nav-modal')">Question 1 of 22 ▴</button>
+    <div class="nav-btns">
+      <button class="btn-secondary" id="prev-btn" onclick="changeQuestion(-1)">Back</button>
+      <button class="btn-primary" id="next-btn" onclick="changeQuestion(1)">Next (Enter ↵)</button>
+    </div>
+  </footer>
+
+  <div class="modal-overlay" id="ref-modal">
+    <div class="modal-box">
+      <h3 style="margin-bottom:15px;">SAT Math Reference Sheet</h3>
+      <p style="line-height:2; font-size:16px;">
+        • <b>Circle:</b> $A = \pi r^2$ , $\quad C = 2\pi r$<br>
+        • <b>Rectangle:</b> $A = \ell w$<br>
+        • <b>Triangle:</b> $A = \frac{1}{2}bh$<br>
+        • <b>Pythagorean Theorem:</b> $a^2 + b^2 = c^2$<br>
+        • <b>Rectangular Prism:</b> $V = \ell wh$<br>
+        • <b>Cylinder:</b> $V = \pi r^2 h$<br>
+        • <b>Sphere:</b> $V = \frac{4}{3}\pi r^3$<br>
+        • <b>Cone:</b> $V = \frac{1}{3}\pi r^2 h$<br>
+        • <b>Rectangular Pyramid:</b> $V = \frac{1}{3}\ell wh$
+      </p>
+      <button class="btn-primary" style="margin-top:20px;" onclick="toggleModal('ref-modal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="nav-modal">
+    <div class="modal-box">
+      <h3 id="nav-modal-title">Module 1 Questions</h3>
+      <div class="q-grid" id="q-grid"></div>
+      <div style="display:flex; justify-content:space-between; margin-top:15px;">
+        <button class="btn-secondary" onclick="toggleModal('nav-modal')">Close</button>
+        <button class="btn-primary" onclick="finishExam()">Submit Full Exam</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="result-modal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+        <div>
+          <h2 id="score-title" style="color:#1e293b;"></h2>
+          <div style="font-size:13px; color:#2563eb; font-weight:700;">Supervised by: Eng. Heba Eyad (+20 12 24608079)</div>
+        </div>
+        <div id="submit-time-badge" style="font-size:13px; color:#475569; font-weight:600;"></div>
+      </div>
+
+      <div class="student-summary-card" id="student-report-header"></div>
+      <div id="results-breakdown"></div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:22px;">
+        <button class="btn-whatsapp" onclick="sendResultWhatsApp()">📲 Send Score to Eng. Heba (WhatsApp)</button>
+        <button class="btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="btn-secondary" onclick="document.getElementById('result-modal').classList.remove('active')">Review Questions</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GOOGLE_SHEET_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+
+    const svgMod1Q9 = `
+      <svg width="360" height="300" viewBox="0 0 360 300" style="background:#fff; border:1px solid #cbd5e1; border-radius:8px;">
+        <g stroke="#e2e8f0" stroke-width="1">
+          ${Array.from({length: 15}, (_, i) => `<line x1="${40 + i*20}" y1="20" x2="${40 + i*20}" y2="260"/>`).join('')}
+          ${Array.from({length: 12}, (_, i) => `<line x1="40" y1="${260 - i*20}" x2="320" y2="${260 - i*20}"/>`).join('')}
+        </g>
+        <line x1="40" y1="260" x2="330" y2="260" stroke="#0f172a" stroke-width="2"/>
+        <line x1="40" y1="260" x2="40" y2="15" stroke="#0f172a" stroke-width="2"/>
+        <text x="335" y="264" font-size="14" font-style="italic" font-weight="bold">x</text>
+        <text x="35" y="12" font-size="14" font-style="italic" font-weight="bold">y</text>
+        <text x="25" y="275" font-size="13">O</text>
+        ${[2,4,6,8,10,12,14].map(n => `<text x="${36 + n*20}" y="278" font-size="12">${n}</text>`).join('')}
+        ${[2,4,6,8,10].map(n => `<text x="18" y="${264 - n*20}" font-size="12">${n}</text>`).join('')}
+        <path d="M 40 160 Q 120 120, 214 40" fill="none" stroke="#0f172a" stroke-width="3"/>
+      </svg>`;
+
+    const svgMod1Q15 = `
+      <svg width="340" height="320" viewBox="0 0 340 320" style="background:#fff; border:1px solid #cbd5e1; border-radius:8px;">
+        <g stroke="#e2e8f0" stroke-width="1">
+          ${Array.from({length: 11}, (_, i) => `<line x1="${45 + i*25}" y1="20" x2="${45 + i*25}" y2="270"/>`).join('')}
+          ${Array.from({length: 11}, (_, i) => `<line x1="45" y1="${270 - i*25}" x2="295" y2="${270 - i*25}"/>`).join('')}
+        </g>
+        <line x1="45" y1="270" x2="305" y2="270" stroke="#0f172a" stroke-width="2"/>
+        <line x1="45" y1="270" x2="45" y2="12" stroke="#0f172a" stroke-width="2"/>
+        <text x="310" y="274" font-size="14" font-style="italic" font-weight="bold">x</text>
+        <text x="40" y="10" font-size="14" font-style="italic" font-weight="bold">y</text>
+        ${[1,2,3,4,5,6,7,8,9,10].map(n => `<text x="${41 + n*25}" y="288" font-size="12">${n}</text>`).join('')}
+        ${[1,2,3,4,5,6,7,8,9,10].map(n => `<text x="24" y="${274 - n*25}" font-size="12">${n}</text>`).join('')}
+        <line x1="45" y1="45" x2="220" y2="270" stroke="#0f172a" stroke-width="3"/>
+        <circle cx="45" cy="45" r="4.5" fill="#0f172a"/>
+        <circle cx="220" cy="270" r="4.5" fill="#0f172a"/>
+      </svg>`;
+
+    const svgMod2Q4 = `
+      <svg width="340" height="230" viewBox="0 0 340 230">
+        <polygon points="40,180 260,180 260,40" fill="none" stroke="#0f172a" stroke-width="2.5"/>
+        <rect x="242" y="162" width="18" height="18" fill="none" stroke="#0f172a" stroke-width="2"/>
+        <text x="135" y="95" font-size="20" font-style="italic" font-weight="bold">x</text>
+        <text x="140" y="208" font-size="18" font-weight="bold">4.7</text>
+        <text x="272" y="118" font-size="18" font-weight="bold">2.6</text>
+        <text x="80" y="225" font-size="12" fill="#475569">Note: Figure not drawn to scale.</text>
+      </svg>`;
+
+    const svgMod2Q6 = `
+      <svg width="300" height="280" viewBox="0 0 300 280">
+        <polygon points="40,165 185,250 265,200 235,20" fill="none" stroke="#0f172a" stroke-width="2.2"/>
+        <line x1="40" y1="165" x2="235" y2="20" stroke="#0f172a" stroke-width="2.2"/>
+        <line x1="185" y1="250" x2="235" y2="20" stroke="#0f172a" stroke-width="2.2"/>
+        <line x1="265" y1="200" x2="235" y2="20" stroke="#0f172a" stroke-width="2.2"/>
+        <line x1="40" y1="165" x2="125" y2="120" stroke="#0f172a" stroke-width="1.8" stroke-dasharray="6,5"/>
+        <line x1="125" y1="120" x2="265" y2="200" stroke="#0f172a" stroke-width="1.8" stroke-dasharray="6,5"/>
+        <line x1="125" y1="120" x2="235" y2="20" stroke="#0f172a" stroke-width="1.8" stroke-dasharray="6,5"/>
+        <line x1="235" y1="20" x2="155" y2="185" stroke="#0f172a" stroke-width="1.8" stroke-dasharray="6,5"/>
+        <polyline points="162,171 174,177 167,191" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="172" y="115" font-size="20" font-style="italic" font-weight="bold">h</text>
+        <text x="95" y="225" font-size="20" font-style="italic" font-weight="bold">ℓ</text>
+        <text x="232" y="242" font-size="20" font-style="italic" font-weight="bold">w</text>
+      </svg>`;
+
+    const examData = {
+      1: [
+        { type: "spr", stem: "$$f(x) = \\frac{12}{11 - x}$$The function $f$ is defined by the given equation. What is the value of $f(x)$ when $x = 9$?", correct: ["6"] },
+        { type: "mcq", stem: "In $\\triangle XYZ$, the measure of $\\angle X$ is $20^\\circ$ and the measure of $\\angle Y$ is $87^\\circ$. What is the measure of $\\angle Z$?", options: ["$67^\\circ$", "$73^\\circ$", "$107^\\circ$", "$197^\\circ$"], correct: 1 },
+        { type: "spr", stem: "$$f(r) = 18 + 3r$$The function $f$ represents the total cost, in dollars, of attending a carnival when $r$ rides are ridden. How many rides can be ridden for a total cost of $87$ dollars?", correct: ["23"] },
+        { type: "mcq", stem: "At a convention center, there are a total of $275$ visitors. Each visitor is located in either room A, room B, or room C. If one of these visitors is selected at random, the probability of selecting a visitor who is located in room A is $0.44$, and the probability of selecting a visitor who is located in room B is $0.16$. How many visitors are located in room C?", options: ["$19$", "$40$", "$77$", "$110$"], correct: 3 },
+        { type: "mcq", stem: "Which expression is equivalent to $5xy(2x^2 + 6y)$?", options: ["$7x^3y + 11xy^3$", "$10x^2y + 6y$", "$10x^2y + 30xy$", "$10x^3y + 30xy^2$"], correct: 3 },
+        { type: "mcq", stem: "$$(z + 4)(z - 6) = 0$$What are all possible solutions to the given equation?", options: ["$-4$ and $-6$", "$-4$ and $6$", "$4$ and $-6$", "$4$ and $6$"], correct: 1 },
+        { type: "mcq", stem: "Marko purchased a camera in August 2017 when the camera had a value of $1,000$ dollars. Each month for the next $50$ months, the value of the camera decreased by $3\\%$ of the previous month's value. Which equation represents this situation, where $v$ is the value of the camera, in dollars, $m$ is the number of months since Marko purchased the camera, and $m \\le 50$?", options: ["$v = 2,017(0.97)^m$", "$v = 2,017(3)^m$", "$v = 1,000(0.97)^m$", "$v = 100(3)^m$"], correct: 2 },
+        { type: "mcq", stem: "A cube has an edge length of $36$ inches. What is the volume, in cubic inches, of the cube?", options: ["$46,656$", "$7,776$", "$1,296$", "$144$"], correct: 0 },
+        { type: "mcq", stem: "The graph models the population, in thousands, of a town $x$ years since 2003, where $0 \\le x \\le 15$. Which statement is the best interpretation of the point $(1, 5.54)$?", options: ["In 2003, the estimated population of the town was $5,540$.", "In 2004, the estimated population of the town was $5,540$.", "In 2017, the estimated population of the town was $5,540$.", "In 2018, the estimated population of the town was $5,540$."], correct: 1, svg: svgMod1Q9 },
+        { type: "mcq", stem: "$$p(x) = 131 - 3x$$The function $p$ shown gives the number of blank sheets of paper, $p(x)$, remaining in a printer $x$ days after the printer has been loaded with paper. Which statement is the best interpretation of $p(5) = 116$?", options: ["The number of blank sheets of paper remaining in the printer decreased by a total of $5$ sheets after $116$ days.", "There were $5$ blank sheets of paper remaining in the printer $116$ days after the printer had been loaded with paper.", "There were $116$ blank sheets of paper remaining in the printer $5$ days after the printer had been loaded with paper.", "The number of blank sheets of paper remaining in the printer decreased by a total of $116$ sheets after $5$ days."], correct: 2 },
+        { type: "mcq", stem: "$$y = (x - 7)(x + 6)$$$$y = 4x - 28$$A solution to the given system of equations is $(x, y) = (a, b)$. Which of the following could be the value of $a$?", options: ["$7$", "$6$", "$-6$", "$-7$"], correct: 0 },
+        { type: "mcq", stem: "Rattlesnakes do not lay eggs but give birth to live young. For the last three years, a rattlesnake at a zoo gave birth to one litter per year. The table shows the number of rattlesnakes in each of these three litters.<table class='sat-table'><tr><th>Litter number</th><th>Number of rattlesnakes</th></tr><tr><td>1</td><td>13</td></tr><tr><td>2</td><td>11</td></tr><tr><td>3</td><td>15</td></tr></table>What is the mean number of rattlesnakes per litter for these three litters?", options: ["$2$", "$11$", "$13$", "$15$"], correct: 2 },
+        { type: "mcq", stem: "Hassan put up wire fencing along each edge of a rectangular garden with a length of $x$ feet and a width of $y$ feet. Hassan put up a total length of $22$ feet of wire fencing. Which equation represents this situation?", options: ["$xy = 22$", "$2xy = 22$", "$x + y = 22$", "$2x + 2y = 22$"], correct: 3 },
+        { type: "spr", stem: "The price of an item increased by $p\\%$ from $\\$78$ to $\\$81$. What is the value of $p$?", correct: ["50/13", "3.85", "3.846"] },
+        { type: "mcq", stem: "A line segment is shown in the $xy$-plane. If line $\\ell$ (not shown) is perpendicular to the line segment shown and passes through the point $(0, 6)$, which equation defines line $\\ell$?", options: ["$9x + 7y = 42$", "$-9x + 7y = 42$", "$7x + 9y = 54$", "$-7x + 9y = 54$"], correct: 3, svg: svgMod1Q15 },
+        { type: "mcq", stem: "The exponential function $g$ is defined by $g(x) = ab^x$, where $a$ and $b$ are positive constants. If $g(c) = m$ and the value of $g(c + 1)$ is $75\\%$ more than the value of $m$, where $c$ and $m$ are constants, what is the value of $b$?", options: ["$0.25$", "$0.75$", "$1.75$", "$3.5$"], correct: 2 },
+        { type: "spr", stem: "$$(2x^3 - 8) - (-5x^3 + 7)$$The given expression is equivalent to $bx^3 - 15$, where $b$ is a constant. What is the value of $b$?", correct: ["7"] },
+        { type: "mcq", stem: "A circle in the $xy$-plane has its center at $(-9, -8)$ and intersects the line $y = a$ at exactly one point, where $a$ is a positive constant. Which equation defines this circle?", options: ["$(x + 9)^2 + (y + 8)^2 = (a + 8)^2$", "$(x + 9)^2 + (y + 8)^2 = (a - 8)^2$", "$(x - 9)^2 + (y - 8)^2 = (a + 8)^2$", "$(x - 9)^2 + (y - 8)^2 = (a - 8)^2$"], correct: 0 },
+        { type: "mcq", stem: "A machine makes $3$-inch, $7$-inch, and $10$-inch parts. During a certain day, the number of $3$-inch parts that the machine makes is $5$ times the number $n$ of $7$-inch parts, and the number of $10$-inch parts is $4$. During this day, the machine makes $100$ parts total. Which equation represents this situation?", options: ["$3(5n) + 7n + 10(4) = 100$", "$3n + 7n + 10n = 100$", "$5n + 4 = 100$", "$6n + 4 = 100$"], correct: 3 },
+        { type: "mcq", stem: "$$44x^2 + (44b + a)x + ab = 0$$In the given equation, $a$ and $b$ are positive constants. The product of the solutions to the given equation is $kab$, where $k$ is a constant. What is the value of $k$?", options: ["$\\frac{1}{44}$", "$\\frac{1}{11}$", "$1$", "$44$"], correct: 0 },
+        { type: "spr", stem: "The function $f$ is defined by $f(x) = 65x - 40$. What is the value of $f(x)$ when $x = 8$?", correct: ["480"] },
+        { type: "mcq", stem: "In triangle $XYZ$, two of the angles have the same measure. If the measure of angle $X$ is $158^\\circ$ and the measure of angle $Y$ is $11^\\circ$, what is the measure of angle $Z$?", options: ["$180^\\circ$", "$158^\\circ$", "$22^\\circ$", "$11^\\circ$"], correct: 3 }
+      ],
+      2: [
+        { type: "mcq", stem: "$$\\sqrt{w} + 35 = 45$$What is the solution to the given equation?", options: ["$100$", "$20$", "$5$", "$2$"], correct: 0 },
+        { type: "spr", stem: "The equation $56 = 2x + 2y$ gives the perimeter of a rectangular garden that has length $x$, in feet, and width $y$, in feet. The width of the garden is $13$ feet. What is the length, in feet, of the garden?", correct: ["15"] },
+        { type: "spr", stem: "The ratio of the side length of square A to the side length of square B is $4$ to $20$. Square A has a side length of $11$ inches. What is the side length, in inches, of square B?", correct: ["55"] },
+        { type: "mcq", stem: "For the right triangle shown with legs of length $2.6$ and $4.7$ and hypotenuse of length $x$, the value of $x$ is between which two consecutive integers?", options: ["$2$ and $3$", "$5$ and $6$", "$7$ and $8$", "$28$ and $29$"], correct: 1, svg: svgMod2Q4 },
+        { type: "mcq", stem: "The measure of angle $Z$ is $15$ degrees. What is the measure, in radians, of angle $Z$?", options: ["$\\frac{1}{24}\\pi$", "$\\frac{1}{12}\\pi$", "$\\frac{1}{6}\\pi$", "$\\frac{1}{4}\\pi$"], correct: 1 },
+        { type: "spr", stem: "The figure shown is a right rectangular pyramid, where $\\ell = 10$ units, $w = 5$ units, and $h = 11$ units. What is the volume, in cubic units, of the pyramid?", correct: ["550/3", "183.33", "183.3"], svg: svgMod2Q6 },
+        { type: "spr", stem: "$$(7x^3 - 3) - (-6x^3 + 5)$$The given expression is equivalent to $bx^3 - 8$, where $b$ is a constant. What is the value of $b$?", correct: ["13"] },
+        { type: "spr", stem: "$$6(x - 3) = 13 + 4(x - 3)$$If $x$ is the solution to the given equation, what is the value of $x - 3$?", correct: ["6.5", "13/2"] },
+        { type: "mcq", stem: "Line $k$ is defined by $y = 7x + \\frac{1}{4}$. Line $j$ is perpendicular to line $k$ in the $xy$-plane. What is the slope of line $j$?", options: ["$-4$", "$-\\frac{1}{7}$", "$\\frac{1}{4}$", "$7$"], correct: 1 },
+        { type: "mcq", stem: "The graph of a polynomial function $y = f(x)$ in the $xy$-plane passes through the point $(9, 5)$. What is the value of $f(9)$?", options: ["$5$", "$9$", "$14$", "$45$"], correct: 0 },
+        { type: "mcq", stem: "$$x(x + 11) - 15 = 0$$What are the solutions to the given equation?", options: ["$x = \\frac{11 \\pm \\sqrt{61}}{2}$", "$x = \\frac{11 \\pm \\sqrt{181}}{2}$", "$x = \\frac{-11 \\pm \\sqrt{61}}{2}$", "$x = \\frac{-11 \\pm \\sqrt{181}}{2}$"], correct: 3 },
+        { type: "mcq", stem: "The function $f$ is defined by $f(x) = 4x - 6$. If $f(a) + 1 = 3a$, what is the value of $a$?", options: ["$7$", "$5$", "$1$", "$-1$"], correct: 1 },
+        { type: "mcq", stem: "$$g(x) = x^2 + 6x + 90$$The function $g$ is defined by the given equation. Which of the following equivalent forms of the equation displays the minimum value of the function as a constant or coefficient?", options: ["$g(x) = (x + 3)^2 + 81$", "$g(x) = x^2 + 2(3x + 45)$", "$g(x) - 90 = x(x + 6)$", "$g(x) - 90 = \\frac{1}{2}x(2x + 12)$"], correct: 0 },
+        { type: "mcq", stem: "<table class='sat-table'><tr><th>$x$</th><th>$y$</th></tr><tr><td>$-6$</td><td>$n + 142$</td></tr><tr><td>$-3$</td><td>$n + 71$</td></tr><tr><td>$0$</td><td>$n$</td></tr></table>The table shows three values of $x$ and their corresponding values of $y$, where $n$ is a constant, for the linear relationship between $x$ and $y$. What is the slope of the line that represents this relationship in the $xy$-plane?", options: ["$-\\frac{71}{3}$", "$-\\frac{3}{71}$", "$\\frac{n + 71}{-3}$", "$\\frac{2n - 71}{3}$"], correct: 0 },
+        { type: "mcq", stem: "During a trip, a car traveled a total of $450$ miles on city roads and highways and used a total of $15$ gallons of gas. The car traveled an average of $29$ miles per gallon of gas on city roads and $35$ miles per gallon of gas on highways. Which system of equations represents this situation, where $c$ is the number of miles the car traveled on city roads and $h$ is the number of miles the car traveled on highways?", options: ["$c + h = 15 \\quad \\text{and} \\quad \\frac{c}{29} + \\frac{h}{35} = 450$", "$c + h = 15 \\quad \\text{and} \\quad 29c + 35h = 450$", "$c + h = 450 \\quad \\text{and} \\quad \\frac{c}{29} + \\frac{h}{35} = 15$", "$c + h = 450 \\quad \\text{and} \\quad 29c + 35h = 15$"], correct: 2 },
+        { type: "mcq", stem: "The exponential function $g$ is defined by $g(x) = ab^x$, where $a$ and $b$ are positive constants. If $g(c) = m$ and the value of $g(c + 1)$ is $68\\%$ more than the value of $m$, where $c$ and $m$ are constants, what is the value of $b$?", options: ["$0.32$", "$0.68$", "$1.68$", "$3.36$"], correct: 2 },
+        { type: "mcq", stem: "Cylinder A and cylinder B are each right circular cylinders with a radius of $4$ inches. The height of cylinder A is half the height of cylinder B, and the total surface area of cylinder A is $128\\pi$ square inches. If the cylinders are glued together along a circular base, what is the height, in inches, of the resulting cylinder?", options: ["$8$", "$12$", "$24$", "$36$"], correct: 3 },
+        { type: "mcq", stem: "<table class='sat-table'><tr><th>Age Group</th><th>Live north of Center St.</th><th>Live south of Center St.</th><th>Total</th></tr><tr><td>Less than 45 years old</td><td>11</td><td>20</td><td>31</td></tr><tr><td>At least 45 years old</td><td>24</td><td>80</td><td>104</td></tr><tr><td><b>Total</b></td><td><b>35</b></td><td><b>100</b></td><td><b>135</b></td></tr></table>The table summarizes members of a local organization by age and whether they live north or south of Center St. If a member of the organization is selected at random, what is the probability that the selected member is at least 45 years old?", options: ["$\\frac{31}{135}$", "$\\frac{35}{135}$", "$\\frac{100}{135}$", "$\\frac{104}{135}$"], correct: 3 },
+        { type: "spr", stem: "The ratio of the side length of square A to the side length of square B is $4$ to $20$. Square A has a side length of $22$ inches. What is the side length, in inches, of square B?", correct: ["110"] },
+        { type: "mcq", stem: "$$(x - 10)(x + 3) = 0$$How many distinct real solutions does the given equation have?", options: ["Zero", "Exactly one", "Exactly two", "Infinitely many"], correct: 2 },
+        { type: "mcq", stem: "Which expression is a factor of $81p^{21} - 121p^{19}$?", options: ["$9p + 11$", "$81p^2 + 121$", "$11p - 9$", "$-40p^{44}$"], correct: 0 },
+        { type: "spr", stem: "The function $h$ is defined by $h(x) = -\\sqrt{x^2 + bx + c}$, where $b$ and $c$ are constants. In the $xy$-plane, the graph of $y = h(x)$ contains the points $(2, 0)$ and $(0, -\\sqrt{390})$. If $h(m) = 0$, what is the greatest possible value of $m$?", correct: ["195"] }
+      ]
+    };
+
+    let studentName = "";
+    let studentGroup = "";
+    let currentModule = 1;
+    let currentIndex = 0;
+    let userAnswers = { 1: new Array(22).fill(null), 2: new Array(22).fill(null) };
+    let markedQuestions = { 1: new Array(22).fill(false), 2: new Array(22).fill(false) };
+    let calcOpen = false;
+    let desmosInstance = null;
+    let timerInterval = null;
+    let timeLeft = 70 * 60; // 70 دقيقة إجمالية للاختبار
+    let lastScoreSummary = { m1: 0, m2: 0, total: 0, timeStr: "" };
+
+    function startExam() {
+      const nameInput = document.getElementById('student-name-input').value.trim();
+      const groupInput = document.getElementById('student-group-input').value.trim();
+      if (!nameInput) {
+        alert("Please enter your full name to start the exam.");
+        return;
+      }
+      studentName = nameInput;
+      studentGroup = groupInput;
+      document.getElementById('footer-student-name').innerText = `Student: ${studentName}`;
+      document.getElementById('start-screen').style.display = 'none';
+
+      timerInterval = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+          const secs = String(timeLeft % 60).padStart(2, '0');
+          document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+        } else {
+          clearInterval(timerInterval);
+          finishExam();
+        }
+      }, 1000);
+
+      renderQuestion();
+    }
+
+    function switchModule(modNum) {
+      currentModule = modNum;
+      currentIndex = 0;
+      document.getElementById('mod1-btn').classList.toggle('active', modNum === 1);
+      document.getElementById('mod2-btn').classList.toggle('active', modNum === 2);
+      document.getElementById('footer-mod-title').innerText = `Eng. Heba Eyad | Module ${modNum}`;
+      document.getElementById('nav-modal-title').innerText = `Module ${modNum} Questions`;
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const questions = examData[currentModule];
+      const q = questions[currentIndex];
+      document.getElementById('q-number').innerText = currentIndex + 1;
+      document.getElementById('q-stem').innerHTML = q.stem;
+      document.getElementById('mark-checkbox').checked = markedQuestions[currentModule][currentIndex];
+      document.getElementById('nav-summary-btn').innerText = `Question ${currentIndex + 1} of ${questions.length} ▴`;
+
+      const leftPane = document.getElementById('left-pane');
+      const diagramArea = document.getElementById('diagram-area');
+      const calcDiv = document.getElementById('calculator');
+
+      if (calcOpen) {
+        leftPane.classList.remove('hidden');
+        calcDiv.style.display = 'block';
+        diagramArea.style.display = 'none';
+      } else if (q.svg || q.image) {
+        leftPane.classList.remove('hidden');
+        calcDiv.style.display = 'none';
+        diagramArea.style.display = 'block';
+        diagramArea.innerHTML = q.image ? `<img src="${q.image}" alt="Diagram"/>` : q.svg;
+      } else {
+        leftPane.classList.add('hidden');
+      }
+
+      const interactionDiv = document.getElementById('q-interaction');
+      const savedAns = userAnswers[currentModule][currentIndex];
+
+      if (q.type === 'mcq') {
+        const letters = ['A', 'B', 'C', 'D'];
+        interactionDiv.innerHTML = `<div class="options-list">` +
+          q.options.map((opt, idx) => `
+            <div class="option-card ${savedAns === idx ? 'selected' : ''}" onclick="selectOption(${idx})">
+              <div class="option-letter">${letters[idx]}</div>
+              <div>${opt}</div>
+            </div>
+          `).join('') + `</div>`;
+      } else {
+        interactionDiv.innerHTML = `
+          <div class="spr-box">
+            <p style="margin-bottom:8px; font-weight:600; color:#475569;">Student-Produced Response (Enter your answer):</p>
+            <input type="text" class="spr-input" id="spr-field" value="${savedAns !== null ? savedAns : ''}" oninput="saveSprAnswer(this.value)" placeholder="Enter number or fraction">
+          </div>`;
+      }
+
+      document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+      if (currentIndex === questions.length - 1) {
+        document.getElementById('next-btn').innerText = currentModule === 1 ? 'Go to Module 2 ➔' : 'Finish Exam';
+      } else {
+        document.getElementById('next-btn').innerText = 'Next (Enter ↵)';
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+      }
+    }
+
+    function selectOption(idx) {
+      userAnswers[currentModule][currentIndex] = idx;
+      renderQuestion();
+    }
+
+    function saveSprAnswer(val) {
+      userAnswers[currentModule][currentIndex] = val.trim();
+    }
+
+    function toggleMark() {
+      markedQuestions[currentModule][currentIndex] = document.getElementById('mark-checkbox').checked;
+    }
+
+    function changeQuestion(step) {
+      const questions = examData[currentModule];
+      if (currentIndex + step >= questions.length) {
+        if (currentModule === 1) {
+          switchModule(2);
+        } else {
+          finishExam();
+        }
+        return;
+      }
+      if (currentIndex + step < 0) return;
+      currentIndex += step;
+      renderQuestion();
+    }
+
+    // تفعيل اختصارات لوحة المفاتيح (Enter للتقدم والأسهم يمين/يسار للتنقل)
+    window.addEventListener('keydown', function(e) {
+      // لو شاشة البداية مفتوحة، عدم تفعيل الاختصارات حتى يبدأ الاختبار
+      if (document.getElementById('start-screen').style.display !== 'none') return;
+      // لو نافذة النتيجة أو النوافذ المنبثقة مفتوحة، لا نتفاعل بالأسهم
+      if (document.getElementById('result-modal').classList.contains('active') || 
+          document.getElementById('nav-modal').classList.contains('active') || 
+          document.getElementById('ref-modal').classList.contains('active')) return;
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        changeQuestion(1);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        changeQuestion(1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        changeQuestion(-1);
+      }
+    });
+
+    function toggleCalculator() {
+      calcOpen = !calcOpen;
+      document.getElementById('calc-btn').classList.toggle('active', calcOpen);
+      renderQuestion();
+      if (calcOpen && !desmosInstance && window.Desmos) {
+        desmosInstance = Desmos.GraphingCalculator(document.getElementById('calculator'));
+      }
+    }
+
+    function toggleModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.toggle('active');
+      if (id === 'nav-modal') {
+        const questions = examData[currentModule];
+        const grid = document.getElementById('q-grid');
+        grid.innerHTML = questions.map((_, idx) => {
+          const ans = userAnswers[currentModule][idx];
+          return `
+            <div class="q-grid-item ${ans !== null && ans !== '' ? 'answered' : ''} ${idx === currentIndex ? 'current' : ''} ${markedQuestions[currentModule][idx] ? 'marked' : ''}"
+                 onclick="currentIndex=${idx}; toggleModal('nav-modal'); renderQuestion();">
+              ${idx + 1}
+            </div>`;
+        }).join('');
+      }
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+      }
+    }
+
+    function finishExam() {
+      let totalCorrect = 0;
+      let modScores = { 1: 0, 2: 0 };
+      const letters = ['A', 'B', 'C', 'D'];
+      let breakdownHTML = '';
+
+      [1, 2].forEach(mod => {
+        let modRows = '';
+        examData[mod].forEach((q, idx) => {
+          const userAns = userAnswers[mod][idx];
+          let isCorrect = false;
+          let userDisplay = "No Answer";
+          let correctDisplay = "";
+
+          if (q.type === 'mcq') {
+            isCorrect = userAns === q.correct;
+            if (userAns !== null) userDisplay = letters[userAns];
+            correctDisplay = letters[q.correct];
+          } else {
+            isCorrect = q.correct.includes(String(userAns));
+            if (userAns) userDisplay = userAns;
+            correctDisplay = q.correct[0];
+          }
+
+          if (isCorrect) { modScores[mod]++; totalCorrect++; }
+          modRows += `
+            <div class="result-row">
+              <div><b>M${mod} - Q${idx + 1}:</b> Your Answer: <b>${userDisplay}</b> | Correct: <b>${correctDisplay}</b></div>
+              <div class="${isCorrect ? 'correct-badge' : 'wrong-badge'}">${isCorrect ? '✔ Correct' : '✘ Incorrect'}</div>
+            </div>`;
+        });
+        breakdownHTML += `<h3 style="margin:18px 0 8px; color:#2563eb;">Module ${mod} Score: ${modScores[mod]} / 22</h3>` + modRows;
+      });
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + now.toLocaleDateString();
+      lastScoreSummary = { m1: modScores[1], m2: modScores[2], total: totalCorrect, timeStr };
+
+      if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
+        fetch(GOOGLE_SHEET_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: studentName,
+            group: studentGroup || "General",
+            m1: modScores[1],
+            m2: modScores[2],
+            total: totalCorrect
+          })
+        }).catch(err => console.log(err));
+      }
+
+      document.getElementById('score-title').innerText = `Total Score: ${totalCorrect} / 44`;
+      document.getElementById('submit-time-badge').innerText = `Submitted: ${timeStr}`;
+      document.getElementById('student-report-header').innerHTML = `
+        <div><b>Student Name:</b> ${studentName || 'N/A'} ${studentGroup ? `(${studentGroup})` : ''}</div>
+        <div><b>Module 1:</b> ${modScores[1]}/22 &nbsp;|&nbsp; <b>Module 2:</b> ${modScores[2]}/22</div>
+      `;
+      document.getElementById('results-breakdown').innerHTML = breakdownHTML;
+      document.getElementById('nav-modal').classList.remove('active');
+      document.getElementById('result-modal').classList.add('active');
+    }
+
+    function sendResultWhatsApp() {
+      const msg = `*SAT Math Exam Result - June 2026 INT A*\n` +
+                  `👤 *Student:* ${studentName} ${studentGroup ? `(${studentGroup})` : ''}\n` +
+                  `📊 *Total Score:* ${lastScoreSummary.total} / 44\n` +
+                  `• Module 1: ${lastScoreSummary.m1} / 22\n` +
+                  `• Module 2: ${lastScoreSummary.m2} / 22\n` +
+                  `⏰ *Submitted at:* ${lastScoreSummary.timeStr}`;
+      const url = `https://wa.me/201224608079?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
+
